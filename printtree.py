@@ -51,27 +51,27 @@ def treePrint2(tree, level=0, prevLevel=[], isLastItem=False):
 
 if __name__ == "__main__":
     tree = {
-    "level0_1":{
-        "level1_1":[
-        "level2_1",
-        "level2_2"
-        ],
-        "level1_2":{
-        "level2_3": {
-            "level3_1": "Cool",
-            "level3_2": "yeah"
+        "level0_1":{
+            "level1_1":[
+            "level2_1",
+            "level2_2"
+            ],
+            "level1_2":{
+            "level2_3": {
+                "level3_1": "Cool",
+                "level3_2": "yeah"
+            },
+            
+            "level2_4": "end"
+            }
         },
-        
-        "level2_4": "end"
+        "level0_2": {
+            "level1_3": "level2_5",
+            "level1_4": [
+            "level2_8",
+            "level2_9"
+            ]
         }
-    },
-    "level0_2": {
-        "level1_3": "level2_5",
-        "level1_4": [
-        "level2_8",
-        "level2_9"
-        ]
-    }
     }
     #treePrint(tree)
     treePrint2(tree)
