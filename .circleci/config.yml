@@ -11,6 +11,25 @@ orbs:
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
 jobs:
+  aws-login-test:
+    docker:
+      - image: cimg/aws:2022.06
+    steps:
+      - checkout
+      # run the aws-cli/setup command from the orb
+      - aws-cli/setup:
+          role-arn: 'arn:aws:iam::654654584079:role/CircleCI-Deployment-Test-Role'
+          aws-region: "ca-central-1"
+          # optional parameters
+          profile-name: "OIDC-PROFILE"
+          role-session-name: “aws-session”
+          session-duration: 1800
+      - run:
+          name: Log-into-AWS-ECR
+          command: |
+            # must use same profile specified in the step above
+            aws sts get-caller-identity --profile "OIDC-PROFILE"
+            aws ecr get-login-password --profile "OIDC-PROFILE"
   build-and-test:
     # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/docs/configuration-reference/#executor-job
@@ -41,3 +60,4 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-and-test
+      - aws-login-test
