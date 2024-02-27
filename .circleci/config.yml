@@ -7,7 +7,7 @@ version: 2.1
 orbs:
   # See the Python orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@2.1.1
-  aws-cli: circleci/aws-cli@4.0
+  aws-cli: circleci/aws-cli@4.1.2
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
@@ -20,7 +20,7 @@ jobs:
           profile_name: OIDC-PROFILE
           role_arn: arn:aws:iam::654654584079:role/CircleCI-Deployment-Test-Role
           role_session_name: aws-session
-          region: ca-central-1
+          # region: ca-central-1
       - run:
           name: Log-into-AWS-ECR
           command: |
