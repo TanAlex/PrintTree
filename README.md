@@ -1,6 +1,5 @@
 # Print a tree like list
 
-
 For example, you have a tree like dictionary:
 ```
 tree = {
