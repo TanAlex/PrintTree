@@ -17,15 +17,16 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup:
-          profile_name: OIDC-PROFILE
+          profile_name: default
           role_arn: arn:aws:iam::654654584079:role/CircleCI-Deployment-Test-Role
           role_session_name: aws-session
+          region: ca-central-1
       - run:
           name: Log-into-AWS-ECR
           command: |
             # must use same profile specified in the step above
-            aws sts get-caller-identity --profile "OIDC-PROFILE"
-            aws ecr get-login-password --profile "OIDC-PROFILE"
+            aws sts get-caller-identity
+            aws ecr get-login-password
   build-and-test:
     # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/docs/configuration-reference/#executor-job
