@@ -20,10 +20,10 @@ jobs:
           role-session-name: "example-session"
           session-duration: "1800"
       - run:
-        name: Log-into-AWS-ECR
-        command: |
-          # must use same profile specified in the step above
-          aws ecr get-login-password --profile "OIDC-PROFILE"
+          name: Log-into-AWS-ECR
+          command: |
+            # must use same profile specified in the step above
+            aws ecr get-login-password --profile "OIDC-PROFILE"
 workflows:
   OIDC-with-AWS:
     jobs:
