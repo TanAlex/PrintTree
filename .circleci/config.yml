@@ -19,12 +19,13 @@ jobs:
       - aws-cli/setup:
           profile_name: OIDC-PROFILE
           role_arn: arn:aws:iam::654654584079:role/CircleCI-Deployment-Test-Role
-          role_session_name: aws-session
+          # role_session_name: aws-session
           # region: ca-central-1
       - run:
           name: Log-into-AWS-ECR
           command: |
             # must use same profile specified in the step above
+            aws configure set default.region ca-central-1
             aws sts get-caller-identity --profile "OIDC-PROFILE"
             aws ecr get-login-password --profile "OIDC-PROFILE"
   build-and-test:
