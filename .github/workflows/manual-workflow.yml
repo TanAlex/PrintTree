@@ -1,0 +1,96 @@
+name: Manual Deployment
+
+# The workflow is triggered manually using the 'workflow_dispatch' event
+on:
+  workflow_dispatch:
+    inputs:
+      service:  # Inputs are how you provide data for manual workflows
+        description: 'Service to work on'
+        required: true
+        type: choice
+        options:
+        - admin-portal2
+        - admiral-podrington
+        - telus-event-integration
+      action:
+        description: 'Choose Plan or Apply'
+        required: true
+        type: choice
+        options:
+        - Plan
+        - Apply
+        default: Plan 
+      region:
+        description: 'Target region'
+        required: true
+        type: choice
+        options:
+        - preprod-ca
+        - prod-ca
+      version:
+        description: 'Version (Git Tag) to work on'
+        required: true
+        default: 'latest'
+        type: string 
+
+jobs:
+  plan-and-apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Welcome Message
+        run: echo "Welcome to use the 'plan and apply' deployment tool"
+
+      # Store the values provided during workflow_dispatch trigger 
+      - name: Set variables
+        run: |
+          echo "SERVICE=${{ github.event.inputs.service }}" >> $GITHUB_ENV
+          echo "ACTION=${{ github.event.inputs.action }}" >> $GITHUB_ENV
+          echo "REGION=${{ github.event.inputs.region }}" >> $GITHUB_ENV
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          if [[ "${{ github.event.inputs.region }}" == "preprod-ca" ]]; then
+            echo "NAMESPACE=preprod" >> $GITHUB_ENV
+          elif [[ "${{ github.event.inputs.region }}" == "prod-ca" ]]; then
+            echo "NAMESPACE=prod" >> $GITHUB_ENV
+          fi
+
+      - name: Parameter Verification (with conditional logic)
+        if: ${{ env.VERSION != 'latest' }}  # Only if VERSION is not "latest"
+        run: |
+          if [[ ! ${{ env.VERSION }} =~ ^[[:space:]]*\d+\.\d+\.\d+[[:space:]]*$ ]]; then
+            echo "Error: VERSION must be in the format 1.2.3"
+            exit 1
+          fi
+
+      - name: Conditional Checkout
+        uses: actions/checkout@v3
+        if: ${{ env.VERSION == 'latest' }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        if: ${{ env.VERSION != 'latest' }}  # Only if VERSION is not "latest"
+        with:
+          ref: ${{ env.VERSION }}  # Checkout the specific tag
+
+      - name: Plan Step
+        # in our use-case, we need to run 'plan' when we 'apply'
+        # otherwise you can uncomment the line below
+        # if: ${{ env.ACTION == 'Plan' }}
+        run: |
+          # if [ ! -d "./services/${{ env.SERVICE }}" ]; then
+          #   echo "Error: Service directory not found."
+          #   exit 1
+          # fi
+          # cd ./services/${{ env.SERVICE }}
+          echo "shipcat -r ${{ env.REGION }} template -s ${{ env.SERVICE }} > /tmp/manifest.${{ env.SERVICE }}.yml"
+          echo "kubectl diff -f /tmp/manifest.${{ env.SERVICE }}.yml"
+          echo "kubectl apply -n $NAMESPACE --dry-run=server -f /tmp/manifest.${{ env.SERVICE }}.yml"
+
+      - name: Apply Step
+        if: ${{ env.ACTION == 'Apply' }}
+        run: |
+          # if [ ! -d "./services/${{ env.SERVICE }}" ]; then
+          #   echo "Error: Service directory not found."
+          #   exit 1
+          # fi
+          # cd ./services/${{ env.SERVICE }}
+          echo "kubectl apply -n $NAMESPACE --dry-run=server -f /tmp/manifest.${{ env.SERVICE }}.yml"
