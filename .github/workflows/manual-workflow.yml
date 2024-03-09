@@ -56,7 +56,7 @@ jobs:
       - name: Parameter Verification (with conditional logic)
         if: ${{ env.VERSION != 'latest' }}  # Only if VERSION is not "latest"
         run: |
-          if [[ ! ${{ env.VERSION }} =~ ^[[:space:]]*\d+\.\d+\.\d+[[:space:]]*$ ]]; then
+          if [[ ! ${{ env.VERSION }} =~ ^[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+[[:space:]]*$ ]]; then
             echo "Error: VERSION must be in the format 1.2.3"
             exit 1
           fi
